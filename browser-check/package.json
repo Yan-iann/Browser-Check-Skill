@@ -1,0 +1,9 @@
+{
+  "name": "browser-check",
+  "private": true,
+  "type": "module",
+  "description": "Cross-browser render check: Chrome, Edge, Firefox and WebKit (Safari engine).",
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}

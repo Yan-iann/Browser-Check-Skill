@@ -1,0 +1,5 @@
+# Built on each machine by the skill's own first run
+node_modules/
+
+# Screenshots from test runs. These are pictures of client sites, keep them out of git.
+render/
