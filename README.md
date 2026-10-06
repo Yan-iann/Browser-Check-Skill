@@ -1,8 +1,8 @@
 # browser-check
 
 A Claude Code skill that checks a web page in four browsers before a visual task is called
-done: Chrome, Edge, Firefox and WebKit (the engine Safari uses), each at desktop (1440) and
-mobile (390) width.
+done: Chrome, Edge, Firefox and WebKit (the engine Safari uses), each at desktop (1440),
+tablet (768) and mobile (390) width.
 
 For every page it saves a screenshot per browser, a side-by-side sheet of all four, and a
 list of console errors, failed requests, broken images and sideways overflow.
@@ -47,10 +47,10 @@ In a project laid out as `websites/<site>/`, they go into that site's own folder
 
 ```
 websites/<site>/render/
-  chrome/          home-desktop.png   home-mobile.png
-  edge/            home-desktop.png   home-mobile.png
-  firefox/         home-desktop.png   home-mobile.png
-  safari-webkit/   home-desktop.png   home-mobile.png
+  chrome/          home-desktop.png   home-tablet.png   home-mobile.png
+  edge/            home-desktop.png   home-tablet.png   home-mobile.png
+  firefox/         home-desktop.png   home-tablet.png   home-mobile.png
+  safari-webkit/   home-desktop.png   home-tablet.png   home-mobile.png
   compare/         home-desktop.html  home-desktop-01.png ...
   browser-check.json
 ```
@@ -66,9 +66,9 @@ than saving somewhere wrong. It never writes to the project root.
   the same rendering engine and catches most Safari-only layout problems, but it is not the
   Safari app or a real iPhone. Reports call it "WebKit (Safari engine)".
 - **Firefox is Playwright's build**, not the Firefox installed on your machine, and its
-  mobile run is a narrow desktop window.
+  tablet and mobile runs are narrow desktop windows.
 - Pages behind a login and unpublished drafts cannot be checked.
 - It only loads and scrolls a page. It never clicks, types or submits a form.
-- One page takes about 4 minutes. Use it on the pages you changed, not a whole site.
+- One page takes about 6 minutes (4 browsers at 3 widths). Use it on the pages you changed, not a whole site.
 
 Full instructions for Claude are in [browser-check/SKILL.md](browser-check/SKILL.md).

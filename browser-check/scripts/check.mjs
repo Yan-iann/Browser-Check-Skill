@@ -1,7 +1,7 @@
 // Cross-browser render check: per URL, browser and width, a full-page screenshot plus console
 // errors, failed requests, horizontal overflow and broken images.
 // node check.mjs <url|file> [url ...] [--site "<folder in websites/>"] [--out <dir>]
-//                    [--browsers chrome,edge,firefox,webkit] [--widths desktop,mobile] [--wait 4000]
+//                    [--browsers chrome,edge,firefox,webkit] [--widths desktop,tablet,mobile] [--wait 4000]
 // <out> is websites/<site>/render in a websites/<site>/ repo, otherwise ./render.
 // -> <out>/<chrome|edge|firefox|safari-webkit>/<slug>-<width>.png, <out>/browser-check.json
 //    and <out>/compare/<slug>-<width>.html + -01.png ... (every browser side by side, one screenful each)
@@ -12,8 +12,8 @@ import { tmpdir, homedir } from 'node:os';
 import { join, resolve, basename, sep, relative, isAbsolute } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
-const USAGE = 'usage: node check.mjs <url|file> [url ...] [--site "<folder in websites/>"] [--out <dir>] [--browsers chrome,edge,firefox,webkit] [--widths desktop,mobile] [--wait 4000]';
-const opt = { browsers: 'chrome,edge,firefox,webkit', widths: 'desktop,mobile', wait: '4000' };
+const USAGE = 'usage: node check.mjs <url|file> [url ...] [--site "<folder in websites/>"] [--out <dir>] [--browsers chrome,edge,firefox,webkit] [--widths desktop,tablet,mobile] [--wait 4000]';
+const opt = { browsers: 'chrome,edge,firefox,webkit', widths: 'desktop,tablet,mobile', wait: '4000' };
 const urls = [], localFiles = [];
 const args = process.argv.slice(2);
 for (let i = 0; i < args.length; i++) {
@@ -74,7 +74,12 @@ const BROWSERS = {
   firefox: { dir: 'firefox', label: 'Firefox', launch: () => firefox.launch() },
   webkit: { dir: 'safari-webkit', label: 'WebKit (Safari engine)', launch: () => webkit.launch() },
 };
-const VIEWPORTS = { desktop: { w: 1440, h: 900, mobile: false }, mobile: { w: 390, h: 844, mobile: true } };
+// ua: the Playwright devices whose user agent a touch width borrows, [Chrome and Edge, WebKit].
+const VIEWPORTS = {
+  desktop: { w: 1440, h: 900, mobile: false },
+  tablet: { w: 768, h: 1024, mobile: true, ua: ['Galaxy Tab S4', 'iPad Mini'] },
+  mobile: { w: 390, h: 844, mobile: true, ua: ['Pixel 7', 'iPhone 14'] },
+};
 
 const pick = (list, table, what) => list.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).map(n => {
   if (n === 'safari') n = 'webkit';
@@ -99,12 +104,12 @@ const absent = n => { try { return !existsSync(builds[n].executablePath()); } ca
 const missing = urls.length ? browsers.filter(n => builds[n] && absent(n)) : [];
 if (missing.length) setup(`npx playwright install ${missing.join(' ')}`, `downloading the ${missing.join(' and ')} build${missing.length > 1 ? 's' : ''}, a few minutes`);
 
-// Firefox has no mobile emulation in Playwright, so its mobile run is a narrow desktop window.
+// Firefox has no mobile emulation in Playwright, so its tablet and mobile runs are narrow desktop windows.
 const contextOptions = (name, vp) => {
   const o = { viewport: { width: vp.w, height: vp.h }, deviceScaleFactor: 1 };
   if (vp.mobile && name !== 'firefox') {
     o.isMobile = true; o.hasTouch = true;
-    o.userAgent = devices[name === 'webkit' ? 'iPhone 14' : 'Pixel 7'].userAgent;
+    o.userAgent = devices[vp.ua[name === 'webkit' ? 1 : 0]]?.userAgent;
   }
   return o;
 };

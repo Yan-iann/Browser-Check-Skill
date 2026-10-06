@@ -1,11 +1,12 @@
 ---
 name: browser-check
-description: Cross-browser render check for a web page in Chrome, Edge, Firefox and WebKit (Safari's engine) at desktop and mobile widths, with a screenshot folder per browser and side-by-side compare sheets. Use as the final check before reporting any task about how a page looks as done, and whenever the user says "check it in all browsers", "cross-browser", "browser check", or asks whether something works or looks right in Safari, Firefox, Edge or on iPhone. Also use when a client reports a problem that only shows in one browser.
+description: Cross-browser render check for a web page in Chrome, Edge, Firefox and WebKit (Safari's engine) at desktop, tablet and mobile widths, with a screenshot folder per browser and side-by-side compare sheets. Use as the final check before reporting any task about how a page looks as done, and whenever the user says "check it in all browsers", "cross-browser", "browser check", or asks whether something works or looks right in Safari, Firefox, Edge or on iPhone. Also use when a client reports a problem that only shows in one browser.
 ---
 
 # Browser Check
 
-Loads the same page in four browser engines at 1440 and 390 wide and saves what each one
+Loads the same page in four browser engines at three widths, desktop (1440), tablet (768)
+and mobile (390), and saves what each one
 actually painted. Chrome is the quick check while you work. This is the check you run once at
 the end, on the pages you changed, before saying a visual task is done.
 
@@ -44,9 +45,9 @@ only set up for that project.
 - In a project with no `websites/` folder it saves to `render` in the current folder.
   `--out <dir>` overrides where the files go.
 - Local harness files work too: pass the file path instead of a URL.
-- Options: `--browsers chrome,edge,firefox,webkit` and `--widths desktop,mobile` to run a
+- Options: `--browsers chrome,edge,firefox,webkit` and `--widths desktop,tablet,mobile` to run a
   subset, `--wait 4000` for the settle time in ms after load (raise it for slow pages).
-- Only the pages the task touched. One page is 8 loads and takes about 4 minutes. For more
+- Only the pages the task touched. One page is 12 loads and takes about 6 minutes. For more
   than two pages run it in the background and report when it finishes. Never sweep a whole
   site with this: it is one visitor loading pages one at a time, keep it that way (STAQ bans
   IPs that rack up 404s, and WPStaq hosts return 429 under load).
@@ -57,10 +58,10 @@ only set up for that project.
 
 ```
 websites/<site>/render/
-  chrome/          <page>-desktop.png   <page>-mobile.png
-  edge/            <page>-desktop.png   <page>-mobile.png
-  firefox/         <page>-desktop.png   <page>-mobile.png
-  safari-webkit/   <page>-desktop.png   <page>-mobile.png
+  chrome/          <page>-desktop.png   <page>-tablet.png   <page>-mobile.png
+  edge/            <page>-desktop.png   <page>-tablet.png   <page>-mobile.png
+  firefox/         <page>-desktop.png   <page>-tablet.png   <page>-mobile.png
+  safari-webkit/   <page>-desktop.png   <page>-tablet.png   <page>-mobile.png
   compare/         <page>-desktop.html  <page>-desktop-01.png ...   (all four side by side)
   browser-check.json
 ```
@@ -101,10 +102,10 @@ Each of these was a false alarm on a real run (shichida.com.au homepage, 2026-10
   cookies as errors, Chrome logs each failed resource, tracking scripts log styled messages
   as errors. Compare the messages. What matters is an exception from the site's own scripts
   that appears in one engine only.
-- **Firefox at 390 is a narrow desktop Firefox**, not Firefox for Android. It has no touch
+- **Firefox at 768 and 390 is a narrow desktop Firefox**, not Firefox for Android. It has no touch
   and no mobile user agent. The JSON row carries a note saying so.
-- **A Chrome or Edge mobile shot that looks shrunk** means the page is wider than the phone
-  (`sideways` in the output is above 0) and the phone zoomed out to fit it. The overflow is
+- **A Chrome or Edge tablet or mobile shot that looks shrunk** means the page is wider than the screen
+  (`sideways` in the output is above 0) and the device zoomed out to fit it. The overflow is
   the finding, not the small text.
 - **Fixed headers, chat bubbles and back-to-top buttons appear in the first screen only.**
   The script hides them after that so they are not stamped down the whole page.
@@ -131,14 +132,14 @@ that it is unconfirmed.
 One verdict sentence, then a table, then the files. No em dashes.
 
 ```
-Checked /pricing/ in four browsers at 1440 and 390. One difference, in WebKit mobile.
+Checked /pricing/ in four browsers at 1440, 768 and 390. One difference, in WebKit mobile.
 
-| Browser                | 1440 | 390                                        |
-|------------------------|------|--------------------------------------------|
-| Chrome                 | OK   | OK                                         |
-| Edge                   | OK   | OK                                         |
-| Firefox                | OK   | OK                                         |
-| WebKit (Safari engine) | OK   | Plan cards overlap the footer (sheet 04)   |
+| Browser                | 1440 | 768 | 390                                        |
+|------------------------|------|-----|--------------------------------------------|
+| Chrome                 | OK   | OK  | OK                                         |
+| Edge                   | OK   | OK  | OK                                         |
+| Firefox                | OK   | OK  | OK                                         |
+| WebKit (Safari engine) | OK   | OK  | Plan cards overlap the footer (sheet 04)   |
 
 Screenshots: websites/<site>/render/compare/pricing-mobile-04.png
 ```
